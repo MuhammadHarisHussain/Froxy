@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Froxy — AI Engineer, Chatbots &amp; Agentic Systems</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECEEF3;
+    --panel:#FFFFFF;
+    --panel-2:#F5F6F9;
+    --ink:#12141F;
+    --ink-soft:#565B6E;
+    --ink-faint:#8A8FA3;
+    --line:#D3D6E0;
+    --line-strong:#B7BBCB;
+    --signal:#3B49DF;
+    --signal-dim:#E7E8FB;
+    --good:#1F9D75;
+    --display:'Space Grotesk', sans-serif;
+    --body:'Inter', sans-serif;
+    --mono:'JetBrains Mono', monospace;
+    --radius:14px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--body);
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit; text-decoration:none;}
+  img,svg{display:block; max-width:100%;}
+  .wrap{max-width:1120px; margin:0 auto; padding:0 32px;}
+  @media (max-width:640px){ .wrap{padding:0 20px;} }
+
+  /* background grid texture */
+  .grid-bg{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:56px 56px;
+    opacity:0.35;
+    mask-image:radial-gradient(ellipse 90% 60% at 50% 0%, black 40%, transparent 85%);
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(236,238,243,0.82);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height:72px;
+  }
+  .logo{
+    font-family:var(--mono); font-weight:500; font-size:15px;
+    letter-spacing:0.02em;
+    display:flex; align-items:center; gap:8px;
+  }
+  .logo .dot{width:7px; height:7px; border-radius:50%; background:var(--signal); flex:none;}
+  .nav-links{display:flex; align-items:center; gap:36px;}
+  .nav-links a{
+    font-size:14px; color:var(--ink-soft); font-weight:500;
+    transition:color 0.15s ease;
+  }
+  .nav-links a:hover, .nav-links a:focus-visible{color:var(--ink);}
+  .status-pill{
+    font-family:var(--mono); font-size:12px; color:var(--good);
+    display:flex; align-items:center; gap:7px;
+    border:1px solid var(--line-strong); border-radius:99px;
+    padding:6px 12px 6px 10px;
+    background:var(--panel);
+  }
+  .status-pill .blip{
+    width:6px; height:6px; border-radius:50%; background:var(--good);
+    box-shadow:0 0 0 0 rgba(31,157,117,0.5);
+    animation:pulse-blip 2s infinite;
+  }
+  @keyframes pulse-blip{
+    0%{box-shadow:0 0 0 0 rgba(31,157,117,0.45);}
+    70%{box-shadow:0 0 0 7px rgba(31,157,117,0);}
+    100%{box-shadow:0 0 0 0 rgba(31,157,117,0);}
+  }
+  @media (max-width:820px){ .nav-links{display:none;} }
+
+  /* ---------- HERO ---------- */
+  .hero{padding:88px 0 40px;}
+  .eyebrow{
+    font-family:var(--mono); font-size:13px; color:var(--signal);
+    letter-spacing:0.03em; margin-bottom:22px; display:block;
+  }
+  h1{
+    font-family:var(--display); font-weight:600;
+    font-size:clamp(38px, 6vw, 66px);
+    line-height:1.04; letter-spacing:-0.01em;
+    max-width:16ch;
+  }
+  h1 em{font-style:normal; color:var(--signal);}
+  .hero-sub{
+    margin-top:24px; max-width:52ch;
+    font-size:18px; color:var(--ink-soft);
+  }
+  .hero-cta{display:flex; gap:14px; margin-top:36px; flex-wrap:wrap;}
+  .btn{
+    font-family:var(--body); font-weight:600; font-size:15px;
+    padding:14px 24px; border-radius:10px; border:1px solid transparent;
+    cursor:pointer; transition:transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  .btn-primary{background:var(--ink); color:var(--paper);}
+  .btn-primary:hover{transform:translateY(-2px); background:var(--signal);}
+  .btn-ghost{background:transparent; color:var(--ink); border-color:var(--line-strong);}
+  .btn-ghost:hover{transform:translateY(-2px); border-color:var(--ink);}
+
+  /* ---------- PIPELINE DIAGRAM ---------- */
+  .pipeline-wrap{
+    margin-top:64px; border:1px solid var(--line); border-radius:var(--radius);
+    background:var(--panel); padding:28px clamp(12px,4vw,40px) 20px;
+    overflow:hidden;
+  }
+  .pipeline-label{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-faint);
+    text-transform:uppercase; letter-spacing:0.08em; margin-bottom:6px;
+  }
+  .node-box{fill:var(--panel-2); stroke:var(--line-strong); stroke-width:1.5;}
+  .node-box.active{fill:var(--signal-dim); stroke:var(--signal);}
+  .node-text{font-family:var(--mono); font-size:13px; fill:var(--ink); font-weight:500;}
+  .node-sub{font-family:var(--mono); font-size:10.5px; fill:var(--ink-faint);}
+  .flow-line{stroke:var(--line-strong); stroke-width:1.5; fill:none;}
+  .loop-line{stroke:var(--signal); stroke-width:1.5; fill:none; stroke-dasharray:4 4; opacity:0.7;}
+  .loop-label{font-family:var(--mono); font-size:10px; fill:var(--signal);}
+  .pulse-dot{fill:var(--signal);}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:96px 0;}
+  .section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:24px; margin-bottom:44px; flex-wrap:wrap;
+  }
+  .section-tag{font-family:var(--mono); font-size:13px; color:var(--signal); margin-bottom:10px; display:block;}
+  h2{font-family:var(--display); font-weight:600; font-size:clamp(28px,4vw,38px); letter-spacing:-0.01em;}
+  .section-desc{max-width:46ch; color:var(--ink-soft); font-size:15.5px;}
+
+  /* ---------- PROJECTS ---------- */
+  .project-grid{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  @media (max-width:760px){ .project-grid{grid-template-columns:1fr;} }
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:28px; opacity:0; transform:translateY(18px);
+    transition:opacity 0.5s ease, transform 0.5s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card.in-view{opacity:1; transform:translateY(0);}
+  .card:hover{border-color:var(--line-strong); box-shadow:0 12px 28px -18px rgba(18,20,31,0.25);}
+  .card-top{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:16px;}
+  .card-kind{
+    font-family:var(--mono); font-size:11px; color:var(--signal);
+    background:var(--signal-dim); border-radius:99px; padding:5px 10px;
+    letter-spacing:0.02em; white-space:nowrap;
+  }
+  .card h3{font-family:var(--display); font-size:21px; font-weight:600; margin-bottom:10px;}
+  .card p{color:var(--ink-soft); font-size:14.5px; margin-bottom:18px;}
+  .tag-row{display:flex; flex-wrap:wrap; gap:8px;}
+  .tag{
+    font-family:var(--mono); font-size:11.5px; color:var(--ink-soft);
+    border:1px solid var(--line); border-radius:6px; padding:4px 9px;
+  }
+  .card-links{display:flex; gap:18px; margin-top:14px;}
+  .card-links a{
+    font-family:var(--mono); font-size:12.5px; color:var(--signal);
+    border-bottom:1px solid transparent; transition:border-color 0.15s ease;
+  }
+  .card-links a:hover{border-color:var(--signal);}
+
+  /* ---------- PROJECT DEMO MEDIA ---------- */
+  .ui-mock{
+    width:100%; display:block; margin-bottom:18px; border-radius:10px;
+    border:1px solid var(--line); object-fit:cover;
+  }
+
+  /* ---------- PROCESS ---------- */
+  .process-list{border-top:1px solid var(--line);}
+  .step{
+    display:grid; grid-template-columns:80px 1fr 1.4fr; gap:24px;
+    padding:28px 0; border-bottom:1px solid var(--line);
+    opacity:0; transform:translateY(14px);
+    transition:opacity 0.5s ease, transform 0.5s ease;
+  }
+  .step.in-view{opacity:1; transform:translateY(0);}
+  @media (max-width:700px){ .step{grid-template-columns:50px 1fr; row-gap:8px;} .step .step-desc{grid-column:1 / -1;} }
+  .step-num{font-family:var(--mono); color:var(--ink-faint); font-size:14px;}
+  .step-title{font-family:var(--display); font-weight:600; font-size:19px;}
+  .step-desc{color:var(--ink-soft); font-size:14.5px; align-self:center;}
+
+  /* ---------- CONTACT ---------- */
+  .contact-panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    padding:clamp(24px,4vw,44px); display:grid; grid-template-columns:1fr 1.3fr; gap:40px;
+  }
+  @media (max-width:800px){ .contact-panel{grid-template-columns:1fr;} }
+  .contact-intro h2{margin-bottom:14px;}
+  .contact-intro p{color:var(--ink-soft); font-size:15px; margin-bottom:26px; max-width:38ch;}
+  .direct-line{font-family:var(--mono); font-size:13.5px; color:var(--ink-soft); margin-bottom:10px;}
+  .direct-line b{color:var(--ink); font-weight:500;}
+  .form-row{margin-bottom:18px;}
+  .form-row label{
+    display:block; font-family:var(--mono); font-size:12px; color:var(--ink-faint);
+    text-transform:uppercase; letter-spacing:0.05em; margin-bottom:8px;
+  }
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media (max-width:520px){ .two-col{grid-template-columns:1fr;} }
+  input, select, textarea{
+    width:100%; font-family:var(--body); font-size:14.5px; color:var(--ink);
+    background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+    padding:12px 14px; transition:border-color 0.15s ease, background 0.15s ease;
+  }
+  input:focus, select:focus, textarea:focus{
+    outline:none; border-color:var(--signal); background:var(--panel);
+  }
+  textarea{resize:vertical; min-height:96px;}
+  .form-foot{display:flex; align-items:center; gap:16px; margin-top:8px; flex-wrap:wrap;}
+  .form-note{font-size:12.5px; color:var(--ink-faint);}
+  #form-status{font-family:var(--mono); font-size:12.5px; color:var(--good);}
+
+  footer{border-top:1px solid var(--line); padding:36px 0;}
+  .footer-row{
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;
+  }
+  .footer-row p{font-family:var(--mono); font-size:12px; color:var(--ink-faint);}
+  .back-top{font-family:var(--mono); font-size:12px; color:var(--ink-soft);}
+  .back-top:hover{color:var(--signal);}
+  .footer-links{display:flex; gap:22px; align-items:center;}
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<header>
+  <nav class="wrap">
+    <div class="logo"><span class="dot"></span>FROXY</div>
+    <div class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </div>
+    <div class="status-pill"><span class="blip"></span>Available for projects</div>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero wrap">
+    <span class="eyebrow">AI ENGINEER — CHATBOTS &amp; AGENTIC SYSTEMS</span>
+    <h1>I build AI agents that <em>do</em> the work, not just talk about it.</h1>
+    <p class="hero-sub">Custom chatbots and agentic AI systems, built to your spec — from the first working prototype to something your team actually runs in production.</p>
+    <div class="hero-cta">
+      <a href="#contact" class="btn btn-primary">Start a project →</a>
+      <a href="#work" class="btn btn-ghost">See the work</a>
+    </div>
+
+    <div class="pipeline-wrap">
+      <span class="pipeline-label">// how a request moves through an agent</span>
+      <svg viewBox="0 0 900 210" width="100%" role="img" aria-label="Diagram of an agent pipeline: query, reasoning, tool call looping until done, then response">
+        <!-- flow line -->
+        <path class="flow-line" d="M110,120 L290,120 L470,120 L650,120 L830,120" id="mainpath"/>
+        <!-- loop between reasoning and tool call -->
+        <path class="loop-line" d="M330,95 C 370,45 430,45 470,95" id="looppath"/>
+        <text class="loop-label" x="345" y="42">iterate until confident</text>
+
+        <!-- nodes -->
+        <rect class="node-box" x="30" y="95" width="160" height="50" rx="9"/>
+        <text class="node-text" x="55" y="116">Client query</text>
+        <text class="node-sub" x="55" y="132">e.g. a stock check</text>
+
+        <rect class="node-box active" x="290" y="95" width="160" height="50" rx="9"/>
+        <text class="node-text" x="310" y="116">Reasoning</text>
+        <text class="node-sub" x="310" y="132">plans next step</text>
+
+        <rect class="node-box" x="550" y="95" width="160" height="50" rx="9"/>
+        <text class="node-text" x="573" y="116">Tool call</text>
+        <text class="node-sub" x="573" y="132">API · DB · search</text>
+
+        <rect class="node-box" x="800" y="95" width="70" height="50" rx="9" transform="translate(-100,0)"/>
+        <text class="node-text" x="723" y="116">Reply</text>
+        <text class="node-sub" x="710" y="132">grounded answer</text>
+
+        <circle class="pulse-dot" r="4.5">
+          <animateMotion dur="4.5s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" calcMode="linear">
+            <mpath href="#mainpath"/>
+          </animateMotion>
+        </circle>
+        <circle class="pulse-dot" r="3" opacity="0.8">
+          <animateMotion dur="1.6s" repeatCount="indefinite">
+            <mpath href="#looppath"/>
+          </animateMotion>
+        </circle>
+      </svg>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section id="work" class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">01 — SELECTED WORK</span>
+        <h2>Systems, not slideware</h2>
+      </div>
+      <p class="section-desc">A mix of client-style builds and shipped academic work — chat platforms, detection systems, and automation pipelines that run end to end.</p>
+    </div>
+
+    <div class="project-grid">
+      <article class="card">
+        <div class="card-top">
+          <h3>Multi-Provider AI Chatbot Platform</h3>
+          <span class="card-kind">chatbot</span>
+        </div>
+        <p>A full-stack chat application that lets a team switch between Anthropic, OpenAI, and Gemini models per conversation, wrapped in a dark, terminal-inspired interface built for developers.</p>
+        <div class="tag-row">
+          <span class="tag">Next.js 14</span><span class="tag">FastAPI</span><span class="tag">Multi-LLM routing</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <h3>FakeDetect — Deepfake &amp; AI-Text Detector</h3>
+          <span class="card-kind">detection system</span>
+        </div>
+        <p>A detection platform pairing a Vision Transformer for manipulated images with DeBERTa-v3-large for AI-written text, with auth, scan history, downloadable reports, and a heatmap comparison slider.</p>
+        <div class="tag-row">
+          <span class="tag">ViT</span><span class="tag">DeBERTa-v3</span><span class="tag">React</span><span class="tag">Flask</span><span class="tag">JWT</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top">
+          <h3>Agentic Follow-Up System for Real Estate Agencies</h3>
+          <span class="card-kind">agentic automation</span>
+        </div>
+        <p>A no-code agent pipeline that answers inbound leads by voice, logs them straight to CRM, and runs multi-channel follow-up sequences — built to run unattended for a solo agency.</p>
+        <div class="tag-row">
+          <span class="tag">Bland.ai</span><span class="tag">Make.com</span><span class="tag">Airtable</span><span class="tag">Instantly.ai</span><span class="tag">ActiveCampaign</span>
+        </div>
+      </article>
+
+      <article class="card card-featured">
+        <div class="card-top">
+          <h3>ViitalCare Custom GPT</h3>
+          <span class="card-kind">custom GPT</span>
+        </div>
+        <p>A domain-tuned GPT assistant built for ViitalCare's healthcare use case — from a fine-tuning notebook through to a deployed chat interface people can query directly, end to end.</p>
+
+        <img class="ui-mock" src="vitalcare-demo.gif" alt="Screen recording of the ViitalCare Custom GPT chat interface in use, looping continuously" loading="lazy">
+
+        <div class="tag-row">
+          <span class="tag">GPT fine-tuning</span><span class="tag">Streamlit</span><span class="tag">Python</span><span class="tag">Healthcare domain</span>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section id="process" class="wrap">
+    <div class="section-head">
+      <div>
+        <span class="section-tag">02 — HOW A PROJECT RUNS</span>
+        <h2>From brief to something running</h2>
+      </div>
+      <p class="section-desc">Every custom build goes through the same four stages, in order — so you always know what you're paying for at each point.</p>
+    </div>
+
+    <div class="process-list">
+      <div class="step">
+        <span class="step-num">01</span>
+        <span class="step-title">Discovery</span>
+        <span class="step-desc">We scope the actual problem: what the agent needs to know, which systems it has to touch, and what "done" looks like for your team.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <span class="step-title">Design</span>
+        <span class="step-desc">Model choice, tool access, and guardrails get mapped out before any code — so the architecture matches the budget and the risk you're comfortable with.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <span class="step-title">Build</span>
+        <span class="step-desc">Implementation, API integrations, and testing against real edge cases — not just the happy path a demo is built to show.</span>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <span class="step-title">Deploy &amp; iterate</span>
+        <span class="step-desc">Shipped, monitored, and refined against how people actually use it — with a clear handoff of what's yours to run.</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="wrap">
+    <div class="contact-panel">
+      <div class="contact-intro">
+        <span class="section-tag">03 — GET IN TOUCH</span>
+        <h2>Have a custom build in mind?</h2>
+        <p>Tell me what the agent needs to do and who it's for. I reply to every serious brief within a couple of days.</p>
+        <div class="direct-line">EMAIL &nbsp;<b>hello@yourdomain.com</b></div>
+        <div class="direct-line">WORKING &nbsp;<b>Remote · serving clients across the US &amp; UK</b></div>
+      </div>
+
+      <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="two-col">
+          <div class="form-row">
+            <label for="name">Name</label>
+            <input id="name" name="name" type="text" required placeholder="Your name">
+          </div>
+          <div class="form-row">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@company.com">
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="form-row">
+            <label for="type">Project type</label>
+            <select id="type" name="type">
+              <option>Custom chatbot</option>
+              <option>Agentic workflow / automation</option>
+              <option>Detection or ML system</option>
+              <option>Something else</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="budget">Budget range</label>
+            <select id="budget" name="budget">
+              <option>Under $500</option>
+              <option>$500 – $2,000</option>
+              <option>$2,000 – $5,000</option>
+              <option>Let's discuss</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="message">Project brief</label>
+          <textarea id="message" name="message" required placeholder="What should this agent do, and what does it need access to?"></textarea>
+        </div>
+        <div class="form-foot">
+          <button type="submit" class="btn btn-primary" id="submit-btn">Send project brief →</button>
+          <span class="form-note">Sent directly to me — used only to reply to your inquiry.</span>
+        </div>
+        <p id="form-status" role="status"></p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap footer-row">
+    <p>© 2026 FROXY — AI ENGINEER</p>
+    <div class="footer-links">
+      <a href="privacy.html" class="back-top">Privacy policy</a>
+      <a href="#top" class="back-top">↑ Back to top</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // reveal on scroll
+  const revealEls = document.querySelectorAll('.card, .step');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in-view'); io.unobserve(e.target); } });
+  }, { threshold: 0.15 });
+  revealEls.forEach(el => io.observe(el));
+
+  // contact form -> real submission (Formspree), with mailto fallback if that's not set up
+  const form = document.getElementById('contact-form');
+  const status = document.getElementById('form-status');
+  const submitBtn = document.getElementById('submit-btn');
+  const FALLBACK_EMAIL = 'hello@yourdomain.com';
+
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const data = new FormData(form);
+    const notConfigured = form.action.includes('YOUR_FORM_ID');
+
+    if (notConfigured) {
+      // no submission endpoint set up yet — fall back to opening the email client
+      const subject = encodeURIComponent(`Project brief: ${data.get('type')} — ${data.get('name')}`);
+      const body = encodeURIComponent(
+        `Name: ${data.get('name')}\nEmail: ${data.get('email')}\nProject type: ${data.get('type')}\nBudget range: ${data.get('budget')}\n\n${data.get('message')}`
+      );
+      window.location.href = `mailto:${FALLBACK_EMAIL}?subject=${subject}&body=${body}`;
+      status.style.color = 'var(--ink-faint)';
+      status.textContent = 'No submission endpoint configured yet — opening your email client instead.';
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending…';
+    status.style.color = 'var(--ink-faint)';
+    status.textContent = '';
+
+    try {
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (res.ok) {
+        form.reset();
+        status.style.color = 'var(--good)';
+        status.textContent = 'Sent — I\'ll reply within a couple of days.';
+        submitBtn.textContent = 'Sent ✓';
+      } else {
+        throw new Error('Submission failed');
+      }
+    } catch (err) {
+      status.style.color = '#C0392B';
+      status.textContent = 'Something went wrong — please email directly instead.';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Send project brief →';
+    }
+  });
+</script>
+</body>
+</html>
